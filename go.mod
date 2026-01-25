@@ -6,7 +6,7 @@ toolchain go1.24.0
 
 require (
 	github.com/go-git/go-git/v5 v5.16.4
-	github.com/golang-jwt/jwt/v5 v5.2.0
+	github.com/golang-jwt/jwt/v5 v5.2.2
 	github.com/google/uuid v1.5.0
 	github.com/gorilla/websocket v1.5.1
 	github.com/mattn/go-sqlite3 v1.14.19
