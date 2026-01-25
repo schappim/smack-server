@@ -1,44 +1,46 @@
-# Smack Server
+# Smack
 
-A real-time chat server written in Go with WebSocket support, REST API, AI bot integration, and more.
+A powerful real-time messaging platform with webhooks, custom apps, kanban boards, and AI-powered bots.
 
 ## Features
 
-- **Real-time messaging** via WebSocket
-- **REST API** for all operations
-- **Channels** - public channels and direct messages
-- **Threaded conversations** - reply to messages in threads
-- **Reactions** - emoji reactions on messages
+- **50+ API Endpoints** - Comprehensive REST API
+- **12 WebSocket Events** - Real-time messaging, typing indicators, presence, AI streaming
+- **7 Widget Types** - Rich HTML widgets for webhooks
+- **JWT Authentication** - Secure token-based auth with 7-day expiry
+
+### Core Features
+
+- **Channels & DMs** - Public channels and direct messages
+- **Threaded Conversations** - Reply to messages in threads
+- **Reactions** - Emoji reactions on messages
+- **File Uploads** - Share images and files
+- **Reminders** - Set time-based reminders
+
+### Advanced Features
+
 - **AI Bots** - OpenAI GPT integration with streaming responses
-- **Kanban boards** - built-in project management
-- **Custom commands** - create slash commands with AI generation
-- **File uploads** - share images and files
-- **Webhooks** - incoming webhooks for integrations
-- **Reminders** - set reminders for yourself
+- **Webhooks** - Incoming webhooks with rich HTML widget support
+- **Custom Commands** - Slash commands with HTTP calls and AI builder
+- **Kanban Boards** - Full project management with boards, columns, cards, labels, and comments
+- **Apps** - Build custom web apps with AI chat assistance and private SQLite databases
 
 ## Quick Start
 
 ### Prerequisites
 
-- Go 1.21 or later
-- (Optional) OpenAI API key for AI bot features
+- Go 1.21+
+- (Optional) OpenAI API key for AI features
 
-### Running
+### Run
 
 ```bash
-# Clone the repository
 git clone https://github.com/schappim/smack-server.git
 cd smack-server
-
-# Run the server
 go run .
-
-# Or build and run
-go build -o smack-server .
-./smack-server
 ```
 
-The server starts on `http://localhost:8080` by default.
+Server starts at `http://localhost:8080`
 
 ### Environment Variables
 
@@ -47,74 +49,58 @@ The server starts on `http://localhost:8080` by default.
 | `PORT` | Server port | `8080` |
 | `DB_PATH` | SQLite database path | `./smack.db` |
 | `UPLOAD_DIR` | File upload directory | `./uploads` |
-| `OPENAI_KEY` | OpenAI API key for AI bot | - |
+| `OPENAI_KEY` | OpenAI API key | - |
 
-## API Overview
+## API Quick Start
 
-See [API.md](API.md) for full documentation.
-
-### Authentication
-
-Register or login to get a JWT token:
+### 1. Register a user
 
 ```bash
-# Register
 curl -X POST http://localhost:8080/api/auth/register \
   -H "Content-Type: application/json" \
-  -d '{"username": "myuser", "display_name": "My Name", "password": "mypassword"}'
-
-# Login
-curl -X POST http://localhost:8080/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"username": "myuser", "password": "mypassword"}'
+  -d '{"username": "myuser", "display_name": "My Name", "password": "secret123"}'
 ```
 
-Use the token in subsequent requests:
+### 2. Use the token
 
 ```bash
 curl http://localhost:8080/api/channels \
-  -H "Authorization: Bearer <your-token>"
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..."
 ```
 
-### WebSocket
+### 3. Send a message
 
-Connect to `/api/ws?token=<jwt_token>` for real-time events:
+```bash
+curl -X POST http://localhost:8080/api/messages \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"channel_id": "CHANNEL_UUID", "content": "Hello, world!"}'
+```
 
-- `new_message` - New message in a channel
-- `message_deleted` - Message was deleted
-- `user_online` / `user_offline` - User presence
-- `typing` - User is typing
-- `message_stream_start/delta/end` - AI streaming responses
-- `reminder` - Reminder triggered
+## Documentation
 
-### Key Endpoints
+Full documentation available in the `docs/` folder:
 
-| Endpoint | Description |
-|----------|-------------|
-| `POST /api/auth/register` | Create account |
-| `POST /api/auth/login` | Login |
-| `GET /api/channels` | List your channels |
-| `POST /api/channels` | Create a channel |
-| `GET /api/channels/{id}/messages` | Get messages |
-| `POST /api/messages` | Send a message |
-| `POST /api/dm` | Create direct message |
-| `GET /api/bots` | List AI bots |
-| `POST /api/bots/dm` | Chat with a bot |
-| `POST /api/files/upload` | Upload a file |
-| `POST /api/webhooks` | Create a webhook |
+- [Authentication](docs/authentication.html) - JWT tokens and auth flow
+- [API Reference](docs/api-reference.html) - All REST endpoints
+- [WebSocket](docs/websocket.html) - Real-time events and streaming
+- [Webhooks](docs/webhooks.html) - Incoming webhooks with HTML widgets
+- [Apps & Widgets](docs/apps-widgets.html) - Custom apps with AI and databases
+- [Kanban](docs/kanban.html) - Project management boards
+- [Commands](docs/commands.html) - Custom slash commands
 
 ## Project Structure
 
 ```
-.
 ├── main.go              # Entry point and routes
-├── ai/                  # AI client (OpenAI)
+├── ai/                  # OpenAI client
 ├── handlers/            # HTTP handlers
 ├── middleware/          # Auth middleware
 ├── models/              # Data models
-├── store/               # SQLite database layer
-├── commands/            # Custom command interpolation
-└── API.md               # API documentation
+├── store/               # SQLite database
+├── commands/            # Command interpolation
+├── docs/                # HTML documentation
+└── API.md               # API reference (markdown)
 ```
 
 ## License

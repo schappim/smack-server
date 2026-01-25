@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smack API Documentation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #818cf8;
+            --bg: #0f0f1a;
+            --bg-card: #1a1a2e;
+            --bg-card-hover: #252542;
+            --text: #e2e8f0;
+            --text-muted: #94a3b8;
+            --border: #2d2d4a;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .hero {
+            background: linear-gradient(180deg, rgba(99, 102, 241, 0.1) 0%, transparent 100%);
+            padding: 80px 20px;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 24px;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto 32px;
+        }
+
+        .hero-links {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .hero-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .hero-link.primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .hero-link.primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .hero-link.secondary {
+            background: var(--bg-card);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .hero-link.secondary:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--primary);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 60px 20px;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 32px;
+            color: var(--text);
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 24px;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 28px;
+            transition: all 0.3s;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            border-color: var(--primary);
+            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.15);
+        }
+
+        .card-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .card-icon.purple { background: var(--gradient-1); }
+        .card-icon.pink { background: var(--gradient-2); }
+        .card-icon.blue { background: var(--gradient-3); }
+        .card-icon.green { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
+        .card-icon.orange { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .card-icon.cyan { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+
+        .card h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .card-footer {
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 4px 10px;
+            background: rgba(99, 102, 241, 0.15);
+            color: var(--primary-light);
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+            margin-bottom: 60px;
+        }
+
+        @media (max-width: 768px) {
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 4px;
+        }
+
+        .quick-start {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px;
+            margin-top: 60px;
+        }
+
+        .quick-start h2 {
+            font-size: 1.5rem;
+            margin-bottom: 24px;
+        }
+
+        .code-block {
+            background: #0d0d1a;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            overflow-x: auto;
+            margin-bottom: 16px;
+        }
+
+        .code-block code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            color: #e2e8f0;
+        }
+
+        .code-block .comment { color: #6b7280; }
+        .code-block .string { color: #34d399; }
+        .code-block .keyword { color: #f472b6; }
+        .code-block .property { color: #60a5fa; }
+
+        footer {
+            background: var(--bg-card);
+            border-top: 1px solid var(--border);
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        footer p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        footer a {
+            color: var(--primary-light);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="hero">
+        <span class="hero-badge">v1.0</span>
+        <h1>Smack API</h1>
+        <p>A powerful real-time messaging platform with webhooks, custom apps, kanban boards, and AI-powered bots.</p>
+        <div class="hero-links">
+            <a href="api-reference.html" class="hero-link primary">
+                <span>API Reference</span>
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+            <a href="authentication.html" class="hero-link secondary">
+                <span>Quick Start</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-value">50+</div>
+                <div class="stat-label">API Endpoints</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">12</div>
+                <div class="stat-label">WebSocket Events</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">7</div>
+                <div class="stat-label">Widget Types</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">JWT</div>
+                <div class="stat-label">Authentication</div>
+            </div>
+        </div>
+
+        <h2 class="section-title">Documentation</h2>
+        <div class="cards-grid">
+            <a href="authentication.html" class="card">
+                <div class="card-icon purple">🔐</div>
+                <h3>Authentication</h3>
+                <p>Learn how to register, login, and use JWT tokens to authenticate your API requests.</p>
+                <div class="card-footer">
+                    <span class="tag">JWT</span>
+                    <span class="tag">Bearer Token</span>
+                    <span class="tag">7-day expiry</span>
+                </div>
+            </a>
+
+            <a href="api-reference.html" class="card">
+                <div class="card-icon blue">📚</div>
+                <h3>API Reference</h3>
+                <p>Complete reference for all REST API endpoints including users, channels, messages, and more.</p>
+                <div class="card-footer">
+                    <span class="tag">REST</span>
+                    <span class="tag">JSON</span>
+                    <span class="tag">CRUD</span>
+                </div>
+            </a>
+
+            <a href="websocket.html" class="card">
+                <div class="card-icon green">⚡</div>
+                <h3>WebSocket</h3>
+                <p>Real-time events for messages, typing indicators, presence, and AI streaming responses.</p>
+                <div class="card-footer">
+                    <span class="tag">Real-time</span>
+                    <span class="tag">Streaming</span>
+                    <span class="tag">Events</span>
+                </div>
+            </a>
+
+            <a href="webhooks.html" class="card">
+                <div class="card-icon pink">🔗</div>
+                <h3>Webhooks</h3>
+                <p>Create incoming webhooks to post messages from external services with rich HTML widgets.</p>
+                <div class="card-footer">
+                    <span class="tag">Incoming</span>
+                    <span class="tag">HTML Widgets</span>
+                    <span class="tag">Integrations</span>
+                </div>
+            </a>
+
+            <a href="apps-widgets.html" class="card">
+                <div class="card-icon orange">🧩</div>
+                <h3>Apps & Widgets</h3>
+                <p>Build custom web applications with HTML/CSS/JS, AI chat assistance, and private databases.</p>
+                <div class="card-footer">
+                    <span class="tag">AI-Powered</span>
+                    <span class="tag">SQLite</span>
+                    <span class="tag">Live Preview</span>
+                </div>
+            </a>
+
+            <a href="kanban.html" class="card">
+                <div class="card-icon cyan">📋</div>
+                <h3>Kanban Boards</h3>
+                <p>Full project management with boards, columns, cards, labels, comments, and assignments.</p>
+                <div class="card-footer">
+                    <span class="tag">Boards</span>
+                    <span class="tag">Cards</span>
+                    <span class="tag">Labels</span>
+                </div>
+            </a>
+
+            <a href="commands.html" class="card">
+                <div class="card-icon blue">⚡</div>
+                <h3>Custom Commands</h3>
+                <p>Create slash commands that call external APIs with dynamic variable interpolation and AI builder.</p>
+                <div class="card-footer">
+                    <span class="tag">Slash Commands</span>
+                    <span class="tag">HTTP</span>
+                    <span class="tag">AI Builder</span>
+                </div>
+            </a>
+        </div>
+
+        <div class="quick-start">
+            <h2>Quick Start</h2>
+            <p style="color: var(--text-muted); margin-bottom: 24px;">Get started with the Smack API in seconds.</p>
+
+            <h4 style="margin-bottom: 12px; color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px;">1. Register a new user</h4>
+            <div class="code-block">
+                <code>
+<span class="keyword">curl</span> -X POST http://localhost:8080/api/auth/register \
+  -H <span class="string">"Content-Type: application/json"</span> \
+  -d <span class="string">'{"username": "myuser", "display_name": "My Name", "password": "secret123"}'</span>
+                </code>
+            </div>
+
+            <h4 style="margin-bottom: 12px; color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px;">2. Use the token in requests</h4>
+            <div class="code-block">
+                <code>
+<span class="keyword">curl</span> http://localhost:8080/api/channels \
+  -H <span class="string">"Authorization: Bearer eyJhbGciOiJIUzI1NiIs..."</span>
+                </code>
+            </div>
+
+            <h4 style="margin-bottom: 12px; color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px;">3. Send a message</h4>
+            <div class="code-block">
+                <code>
+<span class="keyword">curl</span> -X POST http://localhost:8080/api/messages \
+  -H <span class="string">"Authorization: Bearer YOUR_TOKEN"</span> \
+  -H <span class="string">"Content-Type: application/json"</span> \
+  -d <span class="string">'{"channel_id": "CHANNEL_UUID", "content": "Hello, world!"}'</span>
+                </code>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>Smack API Documentation &bull; Built with Go &bull; <a href="https://github.com">View on GitHub</a></p>
+    </footer>
+</body>
+</html>

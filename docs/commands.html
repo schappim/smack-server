@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Commands - Smack API Documentation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #818cf8;
+            --bg: #0f0f1a;
+            --bg-card: #1a1a2e;
+            --bg-card-hover: #252542;
+            --text: #e2e8f0;
+            --text-muted: #94a3b8;
+            --border: #2d2d4a;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --cyan: #06b6d4;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        nav {
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        nav .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        nav a.logo {
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--text);
+            text-decoration: none;
+        }
+
+        nav .nav-links {
+            display: flex;
+            gap: 24px;
+        }
+
+        nav .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+        }
+
+        nav .nav-links a:hover,
+        nav .nav-links a.active {
+            color: var(--primary-light);
+        }
+
+        .page-header {
+            background: linear-gradient(180deg, rgba(6, 182, 212, 0.1) 0%, transparent 100%);
+            padding: 60px 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .page-header .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .page-header p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .content {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 48px 0 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        h2:first-child { margin-top: 0; }
+
+        h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 28px 0 12px;
+            color: var(--text);
+        }
+
+        p { margin-bottom: 16px; color: var(--text-muted); }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 24px 0;
+        }
+
+        .feature-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+        }
+
+        .feature-card h4 {
+            font-size: 1rem;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .feature-card p {
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        .info-box {
+            background: rgba(6, 182, 212, 0.1);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 24px 0;
+        }
+
+        .info-box.purple {
+            background: rgba(99, 102, 241, 0.1);
+            border-color: rgba(99, 102, 241, 0.3);
+        }
+
+        .info-box.green {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+
+        .info-box.warning {
+            background: rgba(245, 158, 11, 0.1);
+            border-color: rgba(245, 158, 11, 0.3);
+        }
+
+        .info-box h4 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .info-box p { margin: 0; font-size: 0.9rem; }
+
+        .code-block {
+            background: #0d0d1a;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin: 16px 0;
+            overflow: hidden;
+        }
+
+        .code-header {
+            background: var(--bg-card);
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .code-header span {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .method-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .method-badge.post { background: #059669; color: white; }
+        .method-badge.get { background: #3b82f6; color: white; }
+        .method-badge.put { background: #f59e0b; color: white; }
+        .method-badge.delete { background: #ef4444; color: white; }
+
+        .code-content {
+            padding: 16px 20px;
+            overflow-x: auto;
+        }
+
+        .code-content pre {
+            margin: 0;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .code-content .comment { color: #6b7280; }
+        .code-content .string { color: #34d399; }
+        .code-content .keyword { color: #f472b6; }
+        .code-content .property { color: #60a5fa; }
+        .code-content .number { color: #fbbf24; }
+
+        .endpoint {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .endpoint-header {
+            padding: 14px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .endpoint-path {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            color: var(--text);
+        }
+
+        .endpoint-desc {
+            padding: 14px 20px;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .endpoint-body { padding: 20px; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+        }
+
+        th {
+            text-align: left;
+            padding: 10px 12px;
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+        }
+
+        td {
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.85rem;
+        }
+
+        td code {
+            font-family: 'JetBrains Mono', monospace;
+            background: rgba(99, 102, 241, 0.15);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            color: var(--primary-light);
+        }
+
+        .required { color: var(--danger); font-size: 0.65rem; font-weight: 500; }
+        .optional { color: var(--text-muted); font-size: 0.65rem; }
+
+        .variable-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+            margin: 24px 0;
+        }
+
+        .variable-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px;
+        }
+
+        .variable-card h5 {
+            font-size: 0.85rem;
+            color: var(--cyan);
+            margin-bottom: 8px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .variable-card p {
+            font-size: 0.85rem;
+            margin: 0;
+        }
+
+        footer {
+            background: var(--bg-card);
+            border-top: 1px solid var(--border);
+            padding: 40px 20px;
+            text-align: center;
+            margin-top: 60px;
+        }
+
+        footer p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="container">
+            <a href="index.html" class="logo">Smack API</a>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="authentication.html">Auth</a>
+                <a href="api-reference.html">API</a>
+                <a href="websocket.html">WebSocket</a>
+                <a href="webhooks.html">Webhooks</a>
+                <a href="apps-widgets.html">Apps</a>
+                <a href="kanban.html">Kanban</a>
+                <a href="commands.html" class="active">Commands</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="page-header">
+        <div class="container">
+            <h1>Custom Commands</h1>
+            <p>Create slash commands that call external APIs with dynamic variable interpolation</p>
+        </div>
+    </div>
+
+    <div class="content">
+        <h2>Overview</h2>
+        <p>Custom commands let you create slash commands (like <code>/weather</code> or <code>/deploy</code>) that trigger HTTP requests to external services. Commands support dynamic variable interpolation, allowing you to pass user input, context info, and timestamps to your APIs.</p>
+
+        <div class="feature-grid">
+            <div class="feature-card">
+                <h4>&#9889; HTTP Integration</h4>
+                <p>Make GET or POST requests to any HTTP/HTTPS endpoint with custom headers and body templates.</p>
+            </div>
+            <div class="feature-card">
+                <h4>&#128295; Variable Interpolation</h4>
+                <p>Use <code>{{variables}}</code> to inject user input, usernames, channel info, and timestamps.</p>
+            </div>
+            <div class="feature-card">
+                <h4>&#129302; AI Command Builder</h4>
+                <p>Describe what you want in plain English and let AI generate the command configuration.</p>
+            </div>
+            <div class="feature-card">
+                <h4>&#128227; Response Modes</h4>
+                <p>Show results privately to the user or post them publicly to the channel.</p>
+            </div>
+        </div>
+
+        <h2>Command Structure</h2>
+
+        <div class="info-box">
+            <h4>Command Name Formatting</h4>
+            <p>
+                Command names are automatically normalized when created:<br>
+                <strong>• Converted to lowercase</strong> ("Weather" → "weather")<br>
+                <strong>• Spaces replaced with dashes</strong> ("My Command" → "my-command")<br>
+                This ensures consistent slash command usage: <code>/my-command</code>
+            </p>
+        </div>
+
+        <div class="code-block">
+            <div class="code-header"><span>Command Object</span></div>
+            <div class="code-content">
+<pre>{
+  <span class="property">"id"</span>: <span class="string">"cmd-uuid"</span>,
+  <span class="property">"name"</span>: <span class="string">"weather"</span>,
+  <span class="property">"description"</span>: <span class="string">"Get weather for a city"</span>,
+  <span class="property">"url"</span>: <span class="string">"https://api.weather.com/v1/current?q={{input}}"</span>,
+  <span class="property">"method"</span>: <span class="string">"GET"</span>,
+  <span class="property">"headers"</span>: <span class="string">"{\"Authorization\": \"Bearer API_KEY\"}"</span>,
+  <span class="property">"body_template"</span>: <span class="string">""</span>,
+  <span class="property">"response_mode"</span>: <span class="string">"private"</span>,
+  <span class="property">"is_global"</span>: <span class="keyword">false</span>,
+  <span class="property">"enabled"</span>: <span class="keyword">true</span>,
+  <span class="property">"created_by"</span>: <span class="string">"user-uuid"</span>,
+  <span class="property">"created_at"</span>: <span class="string">"2024-01-15T10:30:00Z"</span>,
+  <span class="property">"updated_at"</span>: <span class="string">"2024-01-15T10:30:00Z"</span>
+}</pre>
+            </div>
+        </div>
+
+        <table>
+            <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+            <tbody>
+                <tr><td><code>name</code></td><td>string</td><td>Command name - used as <code>/name</code>. Automatically converted to lowercase with spaces replaced by dashes.</td></tr>
+                <tr><td><code>description</code></td><td>string</td><td>Human-readable description</td></tr>
+                <tr><td><code>url</code></td><td>string</td><td>Target URL (supports <code>{{variables}}</code>)</td></tr>
+                <tr><td><code>method</code></td><td>string</td><td><code>GET</code> or <code>POST</code></td></tr>
+                <tr><td><code>headers</code></td><td>string</td><td>JSON object of HTTP headers</td></tr>
+                <tr><td><code>body_template</code></td><td>string</td><td>Request body for POST (supports <code>{{variables}}</code>)</td></tr>
+                <tr><td><code>response_mode</code></td><td>string</td><td><code>private</code> (only sender sees) or <code>channel</code> (posts to channel)</td></tr>
+                <tr><td><code>is_global</code></td><td>boolean</td><td>If true, all users can use this command</td></tr>
+                <tr><td><code>enabled</code></td><td>boolean</td><td>Whether command can be executed</td></tr>
+            </tbody>
+        </table>
+
+        <h2>Variable Interpolation</h2>
+        <p>Use <code>{{variable}}</code> syntax in URLs, headers, and body templates. Variables are replaced at execution time with actual values.</p>
+
+        <h3>Input Variables</h3>
+        <div class="variable-grid">
+            <div class="variable-card">
+                <h5>{{input}}</h5>
+                <p>Full text after command name. <br><code>/weather San Francisco</code> → <code>San Francisco</code></p>
+            </div>
+            <div class="variable-card">
+                <h5>{{input.0}}, {{input.1}}, ...</h5>
+                <p>Individual words by index (0-based). <br><code>/cmd foo bar</code> → <code>input.0 = foo</code></p>
+            </div>
+            <div class="variable-card">
+                <h5>{{input.rest}}</h5>
+                <p>Everything except first word. <br><code>/cmd action do this</code> → <code>do this</code></p>
+            </div>
+        </div>
+
+        <h3>User Variables</h3>
+        <div class="variable-grid">
+            <div class="variable-card">
+                <h5>{{user.id}}</h5>
+                <p>Current user's UUID</p>
+            </div>
+            <div class="variable-card">
+                <h5>{{user.username}}</h5>
+                <p>Current user's username</p>
+            </div>
+            <div class="variable-card">
+                <h5>{{user.displayName}}</h5>
+                <p>Current user's display name</p>
+            </div>
+        </div>
+
+        <h3>Channel Variables</h3>
+        <div class="variable-grid">
+            <div class="variable-card">
+                <h5>{{channel.id}}</h5>
+                <p>Current channel's UUID</p>
+            </div>
+            <div class="variable-card">
+                <h5>{{channel.name}}</h5>
+                <p>Current channel's name</p>
+            </div>
+        </div>
+
+        <h3>Time Variables</h3>
+        <div class="variable-grid">
+            <div class="variable-card">
+                <h5>{{timestamp}}</h5>
+                <p>Unix timestamp (seconds)</p>
+            </div>
+            <div class="variable-card">
+                <h5>{{date}}</h5>
+                <p>Current date: <code>2024-01-15</code></p>
+            </div>
+            <div class="variable-card">
+                <h5>{{datetime}}</h5>
+                <p>ISO8601: <code>2024-01-15T10:30:00Z</code></p>
+            </div>
+        </div>
+
+        <h2>API Endpoints</h2>
+
+        <h3>Create Command</h3>
+        <div class="endpoint">
+            <div class="endpoint-header">
+                <span class="method-badge post">POST</span>
+                <span class="endpoint-path">/api/commands</span>
+            </div>
+            <div class="endpoint-body">
+                <table>
+                    <thead><tr><th>Parameter</th><th>Type</th><th>Description</th></tr></thead>
+                    <tbody>
+                        <tr><td><code>name</code> <span class="required">required</span></td><td>string</td><td>Command name (auto-converted: "My Weather" → "my-weather")</td></tr>
+                        <tr><td><code>url</code> <span class="required">required</span></td><td>string</td><td>Target URL (must start with http:// or https://)</td></tr>
+                        <tr><td><code>method</code></td><td>string</td><td><code>GET</code> or <code>POST</code> (default: GET)</td></tr>
+                        <tr><td><code>description</code></td><td>string</td><td>Command description</td></tr>
+                        <tr><td><code>headers</code></td><td>string</td><td>JSON string of headers</td></tr>
+                        <tr><td><code>body_template</code></td><td>string</td><td>Request body for POST</td></tr>
+                        <tr><td><code>response_mode</code></td><td>string</td><td><code>private</code> or <code>channel</code> (default: private)</td></tr>
+                        <tr><td><code>is_global</code></td><td>boolean</td><td>Make available to all users</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="code-block">
+            <div class="code-header"><span>Example: Weather Command</span></div>
+            <div class="code-content">
+<pre>curl -X POST http://localhost:8080/api/commands \
+  -H <span class="string">"Authorization: Bearer TOKEN"</span> \
+  -H <span class="string">"Content-Type: application/json"</span> \
+  -d <span class="string">'{
+    "name": "weather",
+    "description": "Get current weather for a city",
+    "url": "https://api.weatherapi.com/v1/current.json?key=YOUR_KEY&q={{input}}",
+    "method": "GET",
+    "response_mode": "channel"
+  }'</span></pre>
+            </div>
+        </div>
+
+        <div class="code-block">
+            <div class="code-header"><span>Example: Slack Webhook Command</span></div>
+            <div class="code-content">
+<pre>curl -X POST http://localhost:8080/api/commands \
+  -H <span class="string">"Authorization: Bearer TOKEN"</span> \
+  -H <span class="string">"Content-Type: application/json"</span> \
+  -d <span class="string">'{
+    "name": "slack",
+    "description": "Post a message to Slack",
+    "url": "https://hooks.slack.com/services/YOUR/WEBHOOK/URL",
+    "method": "POST",
+    "headers": "{\"Content-Type\": \"application/json\"}",
+    "body_template": "{\"text\": \"{{input}}\", \"username\": \"{{user.displayName}} via Smack\"}",
+    "response_mode": "private"
+  }'</span></pre>
+            </div>
+        </div>
+
+        <h3>List Commands</h3>
+        <div class="endpoint">
+            <div class="endpoint-header">
+                <span class="method-badge get">GET</span>
+                <span class="endpoint-path">/api/commands</span>
+            </div>
+            <div class="endpoint-desc">Get all commands accessible to the current user (own commands + global commands)</div>
+        </div>
+
+        <h3>Get Command</h3>
+        <div class="endpoint">
+            <div class="endpoint-header">
+                <span class="method-badge get">GET</span>
+                <span class="endpoint-path">/api/commands/{id}</span>
+            </div>
+            <div class="endpoint-desc">Get command details. Only accessible if you own the command or it's global.</div>
+        </div>
+
+        <h3>Update Command</h3>
+        <div class="endpoint">
+            <div class="endpoint-header">
+                <span class="method-badge put">PUT</span>
+                <span class="endpoint-path">/api/commands/{id}</span>
+            </div>
+            <div class="endpoint-desc">Update a command. Only the owner can update.</div>
+            <div class="endpoint-body">
+                <table>
+                    <thead><tr><th>Parameter</th><th>Type</th><th>Description</th></tr></thead>
+                    <tbody>
+                        <tr><td><code>name</code></td><td>string</td><td>New command name</td></tr>
+                        <tr><td><code>description</code></td><td>string</td><td>New description</td></tr>
+                        <tr><td><code>url</code></td><td>string</td><td>New target URL</td></tr>
+                        <tr><td><code>method</code></td><td>string</td><td><code>GET</code> or <code>POST</code></td></tr>
+                        <tr><td><code>headers</code></td><td>string</td><td>New headers JSON</td></tr>
+                        <tr><td><code>body_template</code></td><td>string</td><td>New body template</td></tr>
+                        <tr><td><code>response_mode</code></td><td>string</td><td><code>private</code> or <code>channel</code></td></tr>
+                        <tr><td><code>is_global</code></td><td>boolean</td><td>Share with all users</td></tr>
+                        <tr><td><code>enabled</code></td><td>boolean</td><td>Enable/disable command</td></tr>
+                    </tbody>
+                </table>
+                <p style="margin-top: 12px; font-size: 0.85rem;">All fields are optional - only provided fields are updated.</p>
+            </div>
+        </div>
+
+        <div class="code-block">
+            <div class="code-header"><span>Disable a Command</span></div>
+            <div class="code-content">
+<pre>curl -X PUT http://localhost:8080/api/commands/CMD_ID \
+  -H <span class="string">"Authorization: Bearer TOKEN"</span> \
+  -H <span class="string">"Content-Type: application/json"</span> \
+  -d <span class="string">'{"enabled": false}'</span></pre>
+            </div>
+        </div>
+
+        <h3>Delete Command</h3>
+        <div class="endpoint">
+            <div class="endpoint-header">
+                <span class="method-badge delete">DELETE</span>
+                <span class="endpoint-path">/api/commands/{id}</span>
+            </div>
+            <div class="endpoint-desc">Delete a command. Only the owner can delete.</div>
+        </div>
+
+        <h2>Execute Command</h2>
+        <p>Run a command and get the API response.</p>
+
+        <div class="endpoint">
+            <div class="endpoint-header">
+                <span class="method-badge post">POST</span>
+                <span class="endpoint-path">/api/commands/execute</span>
+            </div>
+            <div class="endpoint-body">
+                <table>
+                    <thead><tr><th>Parameter</th><th>Type</th><th>Description</th></tr></thead>
+                    <tbody>
+                        <tr><td><code>command_id</code> <span class="required">required</span></td><td>string</td><td>Command UUID</td></tr>
+                        <tr><td><code>input</code></td><td>string</td><td>Text after command (e.g., "San Francisco")</td></tr>
+                        <tr><td><code>channel_id</code></td><td>string</td><td>Channel UUID (for channel response mode)</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="code-block">
+            <div class="code-header"><span>Execute Command Request</span></div>
+            <div class="code-content">
+<pre>curl -X POST http://localhost:8080/api/commands/execute \
+  -H <span class="string">"Authorization: Bearer TOKEN"</span> \
+  -H <span class="string">"Content-Type: application/json"</span> \
+  -d <span class="string">'{
+    "command_id": "COMMAND_UUID",
+    "input": "San Francisco",
+    "channel_id": "CHANNEL_UUID"
+  }'</span></pre>
+            </div>
+        </div>
+
+        <div class="code-block">
+            <div class="code-header"><span>Execution Result</span></div>
+            <div class="code-content">
+<pre>{
+  <span class="property">"success"</span>: <span class="keyword">true</span>,
+  <span class="property">"status_code"</span>: <span class="number">200</span>,
+  <span class="property">"response_body"</span>: <span class="string">"{\"location\": {\"name\": \"San Francisco\"}, \"current\": {\"temp_f\": 68}}"</span>
+}</pre>
+            </div>
+        </div>
+
+        <div class="info-box warning">
+            <h4>Execution Notes</h4>
+            <p>
+                <strong>Timeout:</strong> Requests timeout after 30 seconds<br>
+                <strong>Response limit:</strong> Response body is limited to 1MB<br>
+                <strong>Channel mode:</strong> When <code>response_mode</code> is <code>channel</code>, the result is automatically posted as a message
+            </p>
+        </div>
+
+        <h2>AI Command Builder</h2>
+        <p>Describe what you want in plain English and let AI generate the command configuration.</p>
+
+        <div class="endpoint">
+            <div class="endpoint-header">
+                <span class="method-badge post">POST</span>
+                <span class="endpoint-path">/api/commands/ai-generate</span>
+            </div>
+            <div class="endpoint-body">
+                <table>
+                    <thead><tr><th>Parameter</th><th>Type</th><th>Description</th></tr></thead>
+                    <tbody>
+                        <tr><td><code>description</code> <span class="required">required</span></td><td>string</td><td>Natural language description of what you want</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="code-block">
+            <div class="code-header"><span>AI Generate Request</span></div>
+            <div class="code-content">
+<pre>curl -X POST http://localhost:8080/api/commands/ai-generate \
+  -H <span class="string">"Authorization: Bearer TOKEN"</span> \
+  -H <span class="string">"Content-Type: application/json"</span> \
+  -d <span class="string">'{"description": "I want a command to get the current Bitcoin price"}'</span></pre>
+            </div>
+        </div>
+
+        <div class="code-block">
+            <div class="code-header"><span>AI Generate Response</span></div>
+            <div class="code-content">
+<pre>{
+  <span class="property">"command"</span>: {
+    <span class="property">"name"</span>: <span class="string">"btc"</span>,
+    <span class="property">"description"</span>: <span class="string">"Get current Bitcoin price"</span>,
+    <span class="property">"url"</span>: <span class="string">"https://api.coindesk.com/v1/bpi/currentprice.json"</span>,
+    <span class="property">"method"</span>: <span class="string">"GET"</span>,
+    <span class="property">"headers"</span>: <span class="string">""</span>,
+    <span class="property">"body_template"</span>: <span class="string">""</span>,
+    <span class="property">"response_mode"</span>: <span class="string">"private"</span>,
+    <span class="property">"is_global"</span>: <span class="keyword">false</span>
+  },
+  <span class="property">"preview"</span>: <span class="string">"Generated command configuration ready for review."</span>
+}</pre>
+            </div>
+        </div>
+
+        <div class="info-box purple">
+            <h4>After AI Generation</h4>
+            <p>Review the generated configuration and use the Create Command endpoint to save it. You may need to add API keys or adjust settings before creating.</p>
+        </div>
+
+        <h2>Using Commands in Chat</h2>
+        <p>Once created, commands are invoked in chat by typing a slash followed by the command name:</p>
+
+        <div class="code-block">
+            <div class="code-header"><span>Chat Usage</span></div>
+            <div class="code-content">
+<pre><span class="comment"># Simple command</span>
+/weather San Francisco
+
+<span class="comment"># Command with multiple arguments</span>
+/issue octocat/hello-world 42
+
+<span class="comment"># Command with first word as subcommand</span>
+/translate es Hello world</pre>
+            </div>
+        </div>
+
+        <p>The iOS client detects slash commands as you type and executes them when you send the message. Results are displayed based on the <code>response_mode</code>:</p>
+        <table>
+            <thead><tr><th>Mode</th><th>Behavior</th></tr></thead>
+            <tbody>
+                <tr><td><code>private</code></td><td>Result shown only to you in the chat</td></tr>
+                <tr><td><code>channel</code></td><td>Result posted as a message visible to all channel members</td></tr>
+            </tbody>
+        </table>
+
+        <h2>Example Commands</h2>
+
+        <h3>GitHub Issue Lookup</h3>
+        <div class="code-block">
+            <div class="code-header"><span>Usage: /issue octocat/hello-world 1</span></div>
+            <div class="code-content">
+<pre>{
+  <span class="property">"name"</span>: <span class="string">"issue"</span>,
+  <span class="property">"description"</span>: <span class="string">"Look up a GitHub issue"</span>,
+  <span class="property">"url"</span>: <span class="string">"https://api.github.com/repos/{{input.0}}/issues/{{input.1}}"</span>,
+  <span class="property">"method"</span>: <span class="string">"GET"</span>,
+  <span class="property">"headers"</span>: <span class="string">"{\"Accept\": \"application/vnd.github.v3+json\", \"Authorization\": \"token YOUR_TOKEN\"}"</span>,
+  <span class="property">"response_mode"</span>: <span class="string">"channel"</span>
+}</pre>
+            </div>
+        </div>
+
+        <h3>Deploy Trigger</h3>
+        <div class="code-block">
+            <div class="code-header"><span>Usage: /deploy production</span></div>
+            <div class="code-content">
+<pre>{
+  <span class="property">"name"</span>: <span class="string">"deploy"</span>,
+  <span class="property">"description"</span>: <span class="string">"Trigger a deployment"</span>,
+  <span class="property">"url"</span>: <span class="string">"https://your-ci.com/api/deploy"</span>,
+  <span class="property">"method"</span>: <span class="string">"POST"</span>,
+  <span class="property">"headers"</span>: <span class="string">"{\"Authorization\": \"Bearer CI_TOKEN\", \"Content-Type\": \"application/json\"}"</span>,
+  <span class="property">"body_template"</span>: <span class="string">"{\"environment\": \"{{input}}\", \"triggered_by\": \"{{user.username}}\", \"timestamp\": \"{{datetime}}\"}"</span>,
+  <span class="property">"response_mode"</span>: <span class="string">"channel"</span>
+}</pre>
+            </div>
+        </div>
+
+        <h3>Translation Service</h3>
+        <div class="code-block">
+            <div class="code-header"><span>Usage: /translate es Hello, how are you?</span></div>
+            <div class="code-content">
+<pre>{
+  <span class="property">"name"</span>: <span class="string">"translate"</span>,
+  <span class="property">"description"</span>: <span class="string">"Translate text to another language"</span>,
+  <span class="property">"url"</span>: <span class="string">"https://api.mymemory.translated.net/get?q={{input.rest}}&langpair=en|{{input.0}}"</span>,
+  <span class="property">"method"</span>: <span class="string">"GET"</span>,
+  <span class="property">"response_mode"</span>: <span class="string">"private"</span>
+}</pre>
+            </div>
+        </div>
+
+        <h3>Daily Standup Logger</h3>
+        <div class="code-block">
+            <div class="code-header"><span>Usage: /standup Fixed login bug, working on dashboard</span></div>
+            <div class="code-content">
+<pre>{
+  <span class="property">"name"</span>: <span class="string">"standup"</span>,
+  <span class="property">"description"</span>: <span class="string">"Log daily standup update"</span>,
+  <span class="property">"url"</span>: <span class="string">"https://your-api.com/standups"</span>,
+  <span class="property">"method"</span>: <span class="string">"POST"</span>,
+  <span class="property">"headers"</span>: <span class="string">"{\"Content-Type\": \"application/json\"}"</span>,
+  <span class="property">"body_template"</span>: <span class="string">"{\"user\": \"{{user.displayName}}\", \"update\": \"{{input}}\", \"date\": \"{{date}}\", \"channel\": \"{{channel.name}}\"}"</span>,
+  <span class="property">"response_mode"</span>: <span class="string">"channel"</span>
+}</pre>
+            </div>
+        </div>
+
+        <div class="info-box green">
+            <h4>Tips</h4>
+            <p>
+                <strong>1.</strong> Use <code>{{input.0}}</code>, <code>{{input.1}}</code> to parse structured input<br>
+                <strong>2.</strong> Use <code>{{input.rest}}</code> when first word is a subcommand<br>
+                <strong>3.</strong> Set <code>response_mode</code> to <code>channel</code> for team visibility<br>
+                <strong>4.</strong> Store API keys in headers, not URLs<br>
+                <strong>5.</strong> Test with <code>response_mode: private</code> first
+            </p>
+        </div>
+    </div>
+
+    <footer>
+        <p>Smack API Documentation</p>
+    </footer>
+</body>
+</html>

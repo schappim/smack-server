@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Reference - Smack API Documentation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #818cf8;
+            --bg: #0f0f1a;
+            --bg-card: #1a1a2e;
+            --bg-card-hover: #252542;
+            --text: #e2e8f0;
+            --text-muted: #94a3b8;
+            --border: #2d2d4a;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        nav {
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        nav .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        nav a.logo {
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--text);
+            text-decoration: none;
+        }
+
+        nav .nav-links {
+            display: flex;
+            gap: 24px;
+        }
+
+        nav .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+        }
+
+        nav .nav-links a:hover,
+        nav .nav-links a.active {
+            color: var(--primary-light);
+        }
+
+        .layout {
+            display: flex;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .sidebar {
+            width: 280px;
+            padding: 24px;
+            border-right: 1px solid var(--border);
+            height: calc(100vh - 60px);
+            overflow-y: auto;
+            position: sticky;
+            top: 60px;
+        }
+
+        .sidebar h3 {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+            margin-top: 24px;
+        }
+
+        .sidebar h3:first-child { margin-top: 0; }
+
+        .sidebar a {
+            display: block;
+            padding: 8px 12px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .sidebar a:hover {
+            background: var(--bg-card);
+            color: var(--text);
+        }
+
+        .sidebar a.active {
+            background: rgba(99, 102, 241, 0.15);
+            color: var(--primary-light);
+        }
+
+        .content {
+            flex: 1;
+            padding: 40px;
+            max-width: 900px;
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .page-header p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin-bottom: 32px;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 48px 0 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 32px 0 16px;
+            color: var(--text);
+        }
+
+        p { margin-bottom: 16px; color: var(--text-muted); }
+
+        .endpoint {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin: 24px 0;
+            overflow: hidden;
+        }
+
+        .endpoint-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .method-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .method-badge.post { background: #059669; color: white; }
+        .method-badge.get { background: #3b82f6; color: white; }
+        .method-badge.put { background: #f59e0b; color: white; }
+        .method-badge.delete { background: #ef4444; color: white; }
+
+        .endpoint-path {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.95rem;
+            color: var(--text);
+        }
+
+        .endpoint-desc {
+            padding: 16px 20px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .endpoint-body { padding: 20px; }
+
+        .param-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+        }
+
+        .param-table th {
+            text-align: left;
+            padding: 10px 12px;
+            background: rgba(99, 102, 241, 0.1);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+        }
+
+        .param-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.85rem;
+        }
+
+        .param-table code {
+            font-family: 'JetBrains Mono', monospace;
+            background: rgba(99, 102, 241, 0.15);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            color: var(--primary-light);
+        }
+
+        .required { color: var(--danger); font-size: 0.7rem; font-weight: 500; }
+        .optional { color: var(--text-muted); font-size: 0.7rem; }
+
+        .code-block {
+            background: #0d0d1a;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin: 12px 0;
+            overflow: hidden;
+        }
+
+        .code-header {
+            background: var(--bg-card);
+            padding: 10px 16px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .code-content {
+            padding: 16px;
+            overflow-x: auto;
+        }
+
+        .code-content pre {
+            margin: 0;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        .code-content .comment { color: #6b7280; }
+        .code-content .string { color: #34d399; }
+        .code-content .keyword { color: #f472b6; }
+        .code-content .property { color: #60a5fa; }
+        .code-content .number { color: #fbbf24; }
+
+        .section-intro {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 32px;
+        }
+
+        .section-intro h3 {
+            margin: 0 0 8px 0;
+            font-size: 1rem;
+        }
+
+        .section-intro p {
+            margin: 0;
+            font-size: 0.9rem;
+        }
+
+        ul { margin: 16px 0; padding-left: 24px; }
+        li { margin: 8px 0; color: var(--text-muted); }
+        li strong { color: var(--text); }
+
+        @media (max-width: 900px) {
+            .sidebar { display: none; }
+            .content { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="container">
+            <a href="index.html" class="logo">Smack API</a>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="authentication.html">Auth</a>
+                <a href="api-reference.html" class="active">API</a>
+                <a href="websocket.html">WebSocket</a>
+                <a href="webhooks.html">Webhooks</a>
+                <a href="apps-widgets.html">Apps</a>
+                <a href="kanban.html">Kanban</a>
+                <a href="commands.html">Commands</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="layout">
+        <aside class="sidebar">
+            <h3>Getting Started</h3>
+            <a href="#overview">Overview</a>
+            <a href="#base-url">Base URL</a>
+            <a href="#errors">Error Handling</a>
+
+            <h3>Users</h3>
+            <a href="#list-users">List Users</a>
+            <a href="#get-user">Get User</a>
+
+            <h3>Channels</h3>
+            <a href="#list-channels">List Channels</a>
+            <a href="#public-channels">Public Channels</a>
+            <a href="#create-channel">Create Channel</a>
+            <a href="#get-channel">Get Channel</a>
+            <a href="#join-channel">Join Channel</a>
+            <a href="#leave-channel">Leave Channel</a>
+            <a href="#channel-members">Channel Members</a>
+            <a href="#create-dm">Create DM</a>
+
+            <h3>Messages</h3>
+            <a href="#get-messages">Get Messages</a>
+            <a href="#send-message">Send Message</a>
+            <a href="#delete-message">Delete Message</a>
+            <a href="#threads">Threads</a>
+
+            <h3>Reactions</h3>
+            <a href="#add-reaction">Add Reaction</a>
+            <a href="#remove-reaction">Remove Reaction</a>
+
+            <h3>Reminders</h3>
+            <a href="#list-reminders">List Reminders</a>
+            <a href="#create-reminder">Create Reminder</a>
+
+            <h3>Files</h3>
+            <a href="#upload-file">Upload File</a>
+
+            <h3>Bots</h3>
+            <a href="#list-bots">List Bots</a>
+            <a href="#bot-dm">Create Bot DM</a>
+        </aside>
+
+        <main class="content">
+            <div class="page-header">
+                <h1>API Reference</h1>
+                <p>Complete reference for all Smack REST API endpoints</p>
+            </div>
+
+            <section id="overview">
+                <h2>Overview</h2>
+                <div class="section-intro">
+                    <h3>Base URL</h3>
+                    <p><code>http://localhost:8080</code></p>
+                </div>
+
+                <p>All API requests must include a valid JWT token in the Authorization header, except for public endpoints like register, login, and health check.</p>
+
+                <div class="code-block">
+                    <div class="code-header"><span>Authorization Header</span></div>
+                    <div class="code-content">
+<pre>Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...</pre>
+                    </div>
+                </div>
+            </section>
+
+            <section id="errors">
+                <h2>Error Handling</h2>
+                <p>All errors return a JSON object with an <code>error</code> field:</p>
+
+                <div class="code-block">
+                    <div class="code-header"><span>Error Response</span></div>
+                    <div class="code-content">
+<pre>{
+  <span class="property">"error"</span>: <span class="string">"Error message description"</span>
+}</pre>
+                    </div>
+                </div>
+
+                <table class="param-table">
+                    <thead>
+                        <tr>
+                            <th>Status Code</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><code>400</code></td><td>Bad Request - Invalid input</td></tr>
+                        <tr><td><code>401</code></td><td>Unauthorized - Missing or invalid token</td></tr>
+                        <tr><td><code>403</code></td><td>Forbidden - Not allowed to perform action</td></tr>
+                        <tr><td><code>404</code></td><td>Not Found - Resource doesn't exist</td></tr>
+                        <tr><td><code>409</code></td><td>Conflict - Duplicate resource</td></tr>
+                        <tr><td><code>500</code></td><td>Internal Server Error</td></tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section id="list-users">
+                <h2>Users</h2>
+
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method-badge get">GET</span>
+                        <span class="endpoint-path">/api/users</span>
+                    </div>
+                    <div class="endpoint-desc">List all registered users</div>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header"><span>Response</span><span style="color: var(--success);">200 OK</span></div>
+                    <div class="code-content">
+<pre>[
+  {
+    <span class="property">"id"</span>: <span class="string">"uuid"</span>,
+    <span class="property">"username"</span>: <span class="string">"johndoe"</span>,
+    <span class="property">"display_name"</span>: <span class="string">"John Doe"</span>,
+    <span class="property">"avatar_url"</span>: <span class="string">"https://example.com/avatar.png"</span>,
+    <span class="property">"status"</span>: <span class="string">"online"</span>,
+    <span class="property">"created_at"</span>: <span class="string">"2024-01-15T10:30:00Z"</span>
+  }
+]</pre>
+                    </div>
+                </div>
+            </section>
+
+            <section id="get-user">
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method-badge get">GET</span>
+                        <span class="endpoint-path">/api/users/{id}</span>
+                    </div>
+                    <div class="endpoint-desc">Get a specific user by ID</div>
+                </div>
+            </section>
+
+            <section id="list-channels">
+                <h2>Channels</h2>
+
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method-badge get">GET</span>
+                        <span class="endpoint-path">/api/channels</span>
+                    </div>
+                    <div class="endpoint-desc">List channels the current user is a member of</div>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header"><span>Response</span></div>
+                    <div class="code-content">
+<pre>[
+  {
+    <span class="property">"id"</span>: <span class="string">"uuid"</span>,
+    <span class="property">"name"</span>: <span class="string">"general"</span>,
+    <span class="property">"description"</span>: <span class="string">"General discussion"</span>,
+    <span class="property">"is_direct"</span>: <span class="keyword">false</span>,
+    <span class="property">"created_by"</span>: <span class="string">"uuid"</span>,
+    <span class="property">"created_at"</span>: <span class="string">"2024-01-15T10:30:00Z"</span>,
+    <span class="property">"unread_count"</span>: <span class="number">5</span>
+  }
+]</pre>
+                    </div>
+                </div>
+            </section>
+
+            <section id="public-channels">
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method-badge get">GET</span>
+                        <span class="endpoint-path">/api/channels/public</span>
+                    </div>
+                    <div class="endpoint-desc">List all public (non-direct) channels</div>
+                </div>
+            </section>
+
+            <section id="create-channel">
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method-badge post">POST</span>
+                        <span class="endpoint-path">/api/channels</span>
+                    </div>
+                    <div class="endpoint-desc">Create a new channel</div>
+                    <div class="endpoint-body">
+                        <table class="param-table">
+                            <thead><tr><th>Parameter</th><th>Type</th><th>Description</th></tr></thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>name</code> <span class="required">required</span></td>
+                                    <td>string</td>
+                                    <td>Channel name</td>
+                                </tr>
+                                <tr>
+                                    <td><code>description</code> <span class="optional">optional</span></td>
+                                    <td>string</td>
+                                    <td>Channel description</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header"><span>Request</span></div>
+                    <div class="code-content">
+<pre>curl -X POST http://localhost:8080/api/channels \
+  -H <span class="string">"Authorization: Bearer TOKEN"</span> \
+  -H <span class="string">"Content-Type: application/json"</span> \
+  -d <span class="string">'{"name": "engineering", "description": "Engineering team discussions"}'</span></pre>
+                    </div>
+                </div>
+            </section>
+
+            <section id="get-channel">
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method-badge get">GET</span>
+                        <span class="endpoint-path">/api/channels/{id}</span>
+                    </div>
+                    <div class="endpoint-desc">Get channel details</div>
+                </div>
+            </section>
+
+            <section id="join-channel">
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method-badge post">POST</span>
+                        <span class="endpoint-path">/api/channels/{id}/join</span>
+                    </div>
+                    <div class="endpoint-desc">Join a channel</div>
+                </div>
+            </section>
+
+            <section id="leave-channel">
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method-badge post">POST</span>
+                        <span class="endpoint-path">/api/channels/{id}/leave</span>
+                    </div>
+                    <div class="endpoint-desc">Leave a channel</div>
+                </div>
+            </section>
+
+            <section id="channel-members">
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method-badge get">GET</span>
+                        <span class="endpoint-path">/api/channels/{id}/members</span>
+                    </div>
+                    <div class="endpoint-desc">Get all members of a channel</div>
+                </div>
+
+                <h3>Channel Actions</h3>
+                <table class="param-table">
+                    <thead><tr><th>Endpoint</th><th>Method</th><th>Description</th></tr></thead>
+                    <tbody>
+                        <tr><td><code>/api/channels/{id}/read</code></td><td>POST</td><td>Mark channel as read</td></tr>
+                        <tr><td><code>/api/channels/{id}/mute</code></td><td>POST</td><td>Mute channel notifications</td></tr>
+                        <tr><td><code>/api/channels/{id}/unmute</code></td><td>POST</td><td>Unmute channel</td></tr>
+                        <tr><td><code>/api/channels/{id}/clear</code></td><td>POST</td><td>Clear all messages</td></tr>
+                        <tr><td><code>/api/channels/muted</code></td><td>GET</td><td>List muted channel IDs</td></tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section id="create-dm">
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method-badge post">POST</span>
+                        <span class="endpoint-path">/api/dm</span>
+                    </div>
+                    <div class="endpoint-desc">Create or get existing DM channel with another user</div>
+                    <div class="endpoint-body">
+                        <table class="param-table">
+                            <thead><tr><th>Parameter</th><th>Type</th><th>Description</th></tr></thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>user_id</code> <span class="required">required</span></td>
+                                    <td>string</td>
+                                    <td>UUID of the user to message</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section id="get-messages">
+                <h2>Messages</h2>
+
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method-badge get">GET</span>
+                        <span class="endpoint-path">/api/channels/{id}/messages</span>
+                    </div>
+                    <div class="endpoint-desc">Get messages in a channel with pagination</div>
+                    <div class="endpoint-body">
+                        <table class="param-table">
+                            <thead><tr><th>Query Param</th><th>Type</th><th>Description</th></tr></thead>
+                            <tbody>
+                                <tr><td><code>limit</code></td><td>integer</td><td>Number of messages (default: 50, max: 100)</td></tr>
+                                <tr><td><code>before</code></td><td>string</td><td>Message ID for pagination</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header"><span>Response</span></div>
+                    <div class="code-content">
+<pre>[
+  {
+    <span class="property">"id"</span>: <span class="string">"uuid"</span>,
+    <span class="property">"channel_id"</span>: <span class="string">"uuid"</span>,
+    <span class="property">"user"</span>: {
+      <span class="property">"id"</span>: <span class="string">"uuid"</span>,
+      <span class="property">"username"</span>: <span class="string">"johndoe"</span>,
+      <span class="property">"display_name"</span>: <span class="string">"John Doe"</span>,
+      <span class="property">"avatar_url"</span>: <span class="string">"https://..."</span>
+    },
+    <span class="property">"content"</span>: <span class="string">"Hello, world!"</span>,
+    <span class="property">"html"</span>: <span class="keyword">null</span>,
+    <span class="property">"widget_size"</span>: <span class="keyword">null</span>,
+    <span class="property">"thread_id"</span>: <span class="keyword">null</span>,
+    <span class="property">"reply_count"</span>: <span class="number">3</span>,
+    <span class="property">"created_at"</span>: <span class="string">"2024-01-15T10:30:00Z"</span>
+  }
+]</pre>
+                    </div>
+                </div>
+            </section>
+
+            <section id="send-message">
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method-badge post">POST</span>
+                        <span class="endpoint-path">/api/messages</span>
+                    </div>
+                    <div class="endpoint-desc">Send a new message to a channel</div>
+                    <div class="endpoint-body">
+                        <table class="param-table">
+                            <thead><tr><th>Parameter</th><th>Type</th><th>Description</th></tr></thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>channel_id</code> <span class="required">required</span></td>
+                                    <td>string</td>
+                                    <td>Channel UUID</td>
+                                </tr>
+                                <tr>
+                                    <td><code>content</code> <span class="required">required</span></td>
+                                    <td>string</td>
+                                    <td>Message content</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section id="delete-message">
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method-badge delete">DELETE</span>
+                        <span class="endpoint-path">/api/messages/{id}</span>
+                    </div>
+                    <div class="endpoint-desc">Delete a message (author only)</div>
+                </div>
+            </section>
+
+            <section id="threads">
+                <h3>Threads</h3>
+
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method-badge get">GET</span>
+                        <span class="endpoint-path">/api/messages/{id}/thread</span>
+                    </div>
+                    <div class="endpoint-desc">Get all replies to a parent message</div>
+                </div>
+
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method-badge post">POST</span>
+                        <span class="endpoint-path">/api/messages/{id}/reply</span>
+                    </div>
+                    <div class="endpoint-desc">Reply to a message in a thread</div>
+                    <div class="endpoint-body">
+                        <table class="param-table">
+                            <thead><tr><th>Parameter</th><th>Type</th><th>Description</th></tr></thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>content</code> <span class="required">required</span></td>
+                                    <td>string</td>
+                                    <td>Reply content</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section id="add-reaction">
+                <h2>Reactions</h2>
+
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method-badge post">POST</span>
+                        <span class="endpoint-path">/api/reactions</span>
+                    </div>
+                    <div class="endpoint-desc">Add an emoji reaction to a message</div>
+                    <div class="endpoint-body">
+                        <table class="param-table">
+                            <thead><tr><th>Parameter</th><th>Type</th><th>Description</th></tr></thead>
+                            <tbody>
+                                <tr><td><code>message_id</code> <span class="required">required</span></td><td>string</td><td>Message UUID</td></tr>
+                                <tr><td><code>emoji</code> <span class="required">required</span></td><td>string</td><td>Emoji character</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section id="remove-reaction">
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method-badge delete">DELETE</span>
+                        <span class="endpoint-path">/api/reactions</span>
+                    </div>
+                    <div class="endpoint-desc">Remove a reaction from a message</div>
+                </div>
+
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method-badge get">GET</span>
+                        <span class="endpoint-path">/api/messages/{id}/reactions</span>
+                    </div>
+                    <div class="endpoint-desc">Get all reactions for a message</div>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header"><span>Response</span></div>
+                    <div class="code-content">
+<pre>[
+  {
+    <span class="property">"emoji"</span>: <span class="string">"👍"</span>,
+    <span class="property">"count"</span>: <span class="number">3</span>,
+    <span class="property">"users"</span>: [<span class="string">"user_id_1"</span>, <span class="string">"user_id_2"</span>, <span class="string">"user_id_3"</span>]
+  }
+]</pre>
+                    </div>
+                </div>
+            </section>
+
+            <section id="list-reminders">
+                <h2>Reminders</h2>
+
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method-badge get">GET</span>
+                        <span class="endpoint-path">/api/reminders</span>
+                    </div>
+                    <div class="endpoint-desc">List all pending reminders for the current user</div>
+                </div>
+            </section>
+
+            <section id="create-reminder">
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method-badge post">POST</span>
+                        <span class="endpoint-path">/api/reminders</span>
+                    </div>
+                    <div class="endpoint-desc">Create a new reminder</div>
+                    <div class="endpoint-body">
+                        <table class="param-table">
+                            <thead><tr><th>Parameter</th><th>Type</th><th>Description</th></tr></thead>
+                            <tbody>
+                                <tr><td><code>channel_id</code> <span class="required">required</span></td><td>string</td><td>Channel to post reminder in</td></tr>
+                                <tr><td><code>message</code> <span class="required">required</span></td><td>string</td><td>Reminder message</td></tr>
+                                <tr><td><code>remind_at</code></td><td>string</td><td>ISO8601 timestamp</td></tr>
+                                <tr><td><code>remind_in</code></td><td>string</td><td>Relative time (e.g., "30m", "2h", "1d")</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header"><span>Example with relative time</span></div>
+                    <div class="code-content">
+<pre>curl -X POST http://localhost:8080/api/reminders \
+  -H <span class="string">"Authorization: Bearer TOKEN"</span> \
+  -H <span class="string">"Content-Type: application/json"</span> \
+  -d <span class="string">'{
+    "channel_id": "CHANNEL_UUID",
+    "message": "Stand-up meeting!",
+    "remind_in": "30m"
+  }'</span></pre>
+                    </div>
+                </div>
+
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method-badge delete">DELETE</span>
+                        <span class="endpoint-path">/api/reminders/{id}</span>
+                    </div>
+                    <div class="endpoint-desc">Delete a reminder</div>
+                </div>
+            </section>
+
+            <section id="upload-file">
+                <h2>Files</h2>
+
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method-badge post">POST</span>
+                        <span class="endpoint-path">/api/files/upload</span>
+                    </div>
+                    <div class="endpoint-desc">Upload a file (max 10MB). Supported: JPEG, PNG, GIF, WebP, SVG</div>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header"><span>Request</span></div>
+                    <div class="code-content">
+<pre>curl -X POST http://localhost:8080/api/files/upload \
+  -H <span class="string">"Authorization: Bearer TOKEN"</span> \
+  -F <span class="string">"file=@/path/to/image.png"</span></pre>
+                    </div>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header"><span>Response</span></div>
+                    <div class="code-content">
+<pre>{
+  <span class="property">"url"</span>: <span class="string">"/api/files/abc123-image.png"</span>,
+  <span class="property">"filename"</span>: <span class="string">"abc123-image.png"</span>
+}</pre>
+                    </div>
+                </div>
+
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method-badge get">GET</span>
+                        <span class="endpoint-path">/api/files/{filename}</span>
+                    </div>
+                    <div class="endpoint-desc">Retrieve an uploaded file</div>
+                </div>
+            </section>
+
+            <section id="list-bots">
+                <h2>Bots</h2>
+
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method-badge get">GET</span>
+                        <span class="endpoint-path">/api/bots</span>
+                    </div>
+                    <div class="endpoint-desc">List all available bots</div>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header"><span>Response</span></div>
+                    <div class="code-content">
+<pre>[
+  {
+    <span class="property">"id"</span>: <span class="string">"uuid"</span>,
+    <span class="property">"name"</span>: <span class="string">"openai"</span>,
+    <span class="property">"display_name"</span>: <span class="string">"ChatGPT"</span>,
+    <span class="property">"description"</span>: <span class="string">"AI assistant powered by OpenAI"</span>,
+    <span class="property">"provider"</span>: <span class="string">"openai"</span>,
+    <span class="property">"model"</span>: <span class="string">"gpt-5.2"</span>,
+    <span class="property">"avatar_url"</span>: <span class="keyword">null</span>,
+    <span class="property">"created_at"</span>: <span class="string">"2024-01-15T10:30:00Z"</span>
+  }
+]</pre>
+                    </div>
+                </div>
+
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method-badge get">GET</span>
+                        <span class="endpoint-path">/api/bots/{id}</span>
+                    </div>
+                    <div class="endpoint-desc">Get bot details</div>
+                </div>
+            </section>
+
+            <section id="bot-dm">
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method-badge post">POST</span>
+                        <span class="endpoint-path">/api/bots/dm</span>
+                    </div>
+                    <div class="endpoint-desc">Create a DM channel with a bot</div>
+                    <div class="endpoint-body">
+                        <table class="param-table">
+                            <thead><tr><th>Parameter</th><th>Type</th><th>Description</th></tr></thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>bot_id</code> <span class="required">required</span></td>
+                                    <td>string</td>
+                                    <td>Bot UUID</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <p style="margin-top: 16px;">After creating a DM with a bot, you can send messages to it like any other channel. The bot will respond with AI-generated content, streamed via WebSocket.</p>
+            </section>
+        </main>
+    </div>
+</body>
+</html>
