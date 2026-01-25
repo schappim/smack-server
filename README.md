@@ -27,19 +27,37 @@ A powerful real-time messaging platform with webhooks, custom apps, kanban board
 - **Kanban Boards** - Project management with boards, columns, cards, labels
 - **Apps** - Build custom web apps with AI chat and private SQLite databases
 
-## Quick Start
+## Installation
 
-### Prerequisites
+### Homebrew (macOS/Linux)
 
-- Go 1.21+
-- (Optional) OpenAI API key for AI features
+```bash
+brew tap schappim/smack-server
+brew install smack-server
+```
 
-### Run
+### Direct Download
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/schappim/smack-server/main/install.sh | sh
+```
+
+### From Source
 
 ```bash
 git clone https://github.com/schappim/smack-server.git
 cd smack-server
-go run .
+go build -o smack-server .
+```
+
+## Quick Start
+
+```bash
+# Set OpenAI API key (optional, for AI bot features)
+export OPENAI_KEY="your-openai-api-key"
+
+# Start the server
+smack-server
 ```
 
 Server starts at `http://localhost:8080`
