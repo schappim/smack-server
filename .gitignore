@@ -1,0 +1,37 @@
+# Binaries
+server
+smack-server
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Uploads
+uploads/
+
+# Environment files
+.env
+.env.*
+*.pem
+*.key
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Test scripts (may contain test tokens)
+scripts/
+
+# User-created apps (contains user data)
+apps/
+
+# Go
+vendor/
