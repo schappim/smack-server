@@ -28,10 +28,13 @@ uploads/
 .DS_Store
 
 # Test scripts (may contain test tokens)
-scripts/
+scripts/test_*
 
 # User-created apps (contains user data)
 apps/
 
 # Go
 vendor/
+
+# Build output
+dist/
