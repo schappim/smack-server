@@ -32,6 +32,16 @@ func (u *User) ToResponse() UserResponse {
 	}
 }
 
+type UserPreference struct {
+	Key   string `json:"key"`
+	Value string `json:"value"`
+}
+
+type SetPreferenceRequest struct {
+	Key   string `json:"key"`
+	Value string `json:"value"`
+}
+
 type RegisterRequest struct {
 	Username    string `json:"username"`
 	DisplayName string `json:"display_name"`

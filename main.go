@@ -108,6 +108,12 @@ func main() {
 	mux.HandleFunc("GET /api/users/me", withAuth(userHandler.GetMe))
 	mux.HandleFunc("GET /api/users/{id}", withAuth(userHandler.Get))
 
+	// User Preferences
+	mux.HandleFunc("GET /api/users/me/preferences", withAuth(userHandler.GetPreferences))
+	mux.HandleFunc("GET /api/users/me/preferences/{key}", withAuth(userHandler.GetPreference))
+	mux.HandleFunc("PUT /api/users/me/preferences", withAuth(userHandler.SetPreference))
+	mux.HandleFunc("DELETE /api/users/me/preferences/{key}", withAuth(userHandler.DeletePreference))
+
 	// Reminders
 	mux.HandleFunc("GET /api/reminders", withAuth(reminderHandler.List))
 	mux.HandleFunc("POST /api/reminders", withAuth(reminderHandler.Create))

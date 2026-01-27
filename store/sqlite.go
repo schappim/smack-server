@@ -279,6 +279,15 @@ func (s *Store) init() error {
 
 	CREATE INDEX IF NOT EXISTS idx_custom_commands_name ON custom_commands(name);
 	CREATE INDEX IF NOT EXISTS idx_custom_commands_created_by ON custom_commands(created_by);
+
+	-- User preferences (JSON key-value per user)
+	CREATE TABLE IF NOT EXISTS user_preferences (
+		user_id TEXT NOT NULL REFERENCES users(id),
+		key TEXT NOT NULL,
+		value TEXT NOT NULL,
+		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+		PRIMARY KEY (user_id, key)
+	);
 	`
 
 	_, err := s.db.Exec(schema)
@@ -2489,5 +2498,45 @@ func (s *Store) UpdateCommand(id string, req *models.UpdateCommandRequest) error
 
 func (s *Store) DeleteCommand(id, userID string) error {
 	_, err := s.db.Exec("DELETE FROM custom_commands WHERE id = ? AND created_by = ?", id, userID)
+	return err
+}
+
+// User Preferences
+
+func (s *Store) GetUserPreference(userID, key string) (string, error) {
+	var value string
+	err := s.db.QueryRow("SELECT value FROM user_preferences WHERE user_id = ? AND key = ?", userID, key).Scan(&value)
+	return value, err
+}
+
+func (s *Store) GetAllUserPreferences(userID string) ([]models.UserPreference, error) {
+	rows, err := s.db.Query("SELECT key, value FROM user_preferences WHERE user_id = ?", userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var prefs []models.UserPreference
+	for rows.Next() {
+		var p models.UserPreference
+		if err := rows.Scan(&p.Key, &p.Value); err != nil {
+			return nil, err
+		}
+		prefs = append(prefs, p)
+	}
+	return prefs, nil
+}
+
+func (s *Store) SetUserPreference(userID, key, value string) error {
+	_, err := s.db.Exec(`
+		INSERT INTO user_preferences (user_id, key, value, updated_at)
+		VALUES (?, ?, ?, ?)
+		ON CONFLICT(user_id, key) DO UPDATE SET value = excluded.value, updated_at = excluded.updated_at
+	`, userID, key, value, time.Now())
+	return err
+}
+
+func (s *Store) DeleteUserPreference(userID, key string) error {
+	_, err := s.db.Exec("DELETE FROM user_preferences WHERE user_id = ? AND key = ?", userID, key)
 	return err
 }

@@ -98,6 +98,79 @@ func (h *UserHandler) UpdateProfile(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(user.ToResponse())
 }
 
+func (h *UserHandler) GetPreferences(w http.ResponseWriter, r *http.Request) {
+	userID := middleware.GetUserID(r)
+
+	prefs, err := h.store.GetAllUserPreferences(userID)
+	if err != nil {
+		http.Error(w, "Failed to fetch preferences", http.StatusInternalServerError)
+		return
+	}
+	if prefs == nil {
+		prefs = []models.UserPreference{}
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(prefs)
+}
+
+func (h *UserHandler) GetPreference(w http.ResponseWriter, r *http.Request) {
+	userID := middleware.GetUserID(r)
+	key := r.PathValue("key")
+	if key == "" {
+		http.Error(w, "Preference key required", http.StatusBadRequest)
+		return
+	}
+
+	value, err := h.store.GetUserPreference(userID, key)
+	if err != nil {
+		http.Error(w, "Preference not found", http.StatusNotFound)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(models.UserPreference{Key: key, Value: value})
+}
+
+func (h *UserHandler) SetPreference(w http.ResponseWriter, r *http.Request) {
+	userID := middleware.GetUserID(r)
+
+	var req models.SetPreferenceRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	if req.Key == "" {
+		http.Error(w, "Key is required", http.StatusBadRequest)
+		return
+	}
+
+	if err := h.store.SetUserPreference(userID, req.Key, req.Value); err != nil {
+		http.Error(w, "Failed to save preference", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(models.UserPreference{Key: req.Key, Value: req.Value})
+}
+
+func (h *UserHandler) DeletePreference(w http.ResponseWriter, r *http.Request) {
+	userID := middleware.GetUserID(r)
+	key := r.PathValue("key")
+	if key == "" {
+		http.Error(w, "Preference key required", http.StatusBadRequest)
+		return
+	}
+
+	if err := h.store.DeleteUserPreference(userID, key); err != nil {
+		http.Error(w, "Failed to delete preference", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
+
 func (h *UserHandler) UpdateStatus(w http.ResponseWriter, r *http.Request) {
 	userID := middleware.GetUserID(r)
 
