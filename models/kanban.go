@@ -7,6 +7,7 @@ type Board struct {
 	ID          string    `json:"id"`
 	Name        string    `json:"name"`
 	Description string    `json:"description,omitempty"`
+	Icon        string    `json:"icon,omitempty"`
 	CreatedBy   string    `json:"created_by"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
@@ -92,11 +93,13 @@ type KanbanComment struct {
 type CreateBoardRequest struct {
 	Name        string `json:"name"`
 	Description string `json:"description,omitempty"`
+	Icon        string `json:"icon,omitempty"`
 }
 
 type UpdateBoardRequest struct {
-	Name        string `json:"name,omitempty"`
-	Description string `json:"description,omitempty"`
+	Name        string  `json:"name,omitempty"`
+	Description string  `json:"description,omitempty"`
+	Icon        *string `json:"icon,omitempty"`
 }
 
 type CreateColumnRequest struct {

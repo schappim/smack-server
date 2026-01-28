@@ -57,6 +57,7 @@ func main() {
 		uploadDir = "./uploads"
 	}
 	fileHandler := handlers.NewFileHandler(uploadDir)
+	serverHandler := handlers.NewServerHandler(s, uploadDir)
 
 	// Start reminder checker
 	reminderHandler.StartReminderChecker()
@@ -72,8 +73,16 @@ func main() {
 		w.Write([]byte("OK"))
 	})
 
+	// Server info (public - used during login)
+	mux.HandleFunc("GET /api/server", serverHandler.GetPublicInfo)
+
 	// Protected routes (auth required)
 	mux.HandleFunc("GET /api/auth/me", withAuth(authHandler.Me))
+
+	// Server settings (auth required)
+	mux.HandleFunc("PUT /api/server", withAuth(serverHandler.UpdateInfo))
+	mux.HandleFunc("POST /api/server/icon", withAuth(serverHandler.UploadIcon))
+	mux.HandleFunc("DELETE /api/server/icon", withAuth(serverHandler.DeleteIcon))
 
 	// Channels
 	mux.HandleFunc("GET /api/channels", withAuth(channelHandler.List))

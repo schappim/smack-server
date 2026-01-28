@@ -139,6 +139,7 @@ func (s *Store) init() error {
 		id TEXT PRIMARY KEY,
 		name TEXT NOT NULL,
 		description TEXT,
+		icon TEXT,
 		created_by TEXT NOT NULL REFERENCES users(id),
 		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
@@ -288,6 +289,13 @@ func (s *Store) init() error {
 		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 		PRIMARY KEY (user_id, key)
 	);
+
+	-- Server settings (key-value)
+	CREATE TABLE IF NOT EXISTS server_settings (
+		key TEXT PRIMARY KEY,
+		value TEXT NOT NULL,
+		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+	);
 	`
 
 	_, err := s.db.Exec(schema)
@@ -339,6 +347,12 @@ func (s *Store) runMigrations() {
 	s.db.QueryRow(`SELECT COUNT(*) FROM pragma_table_info('apps') WHERE name='icon'`).Scan(&count)
 	if count == 0 {
 		s.db.Exec(`ALTER TABLE apps ADD COLUMN icon TEXT`)
+	}
+
+	// Add icon column to kanban_boards table if it doesn't exist
+	s.db.QueryRow(`SELECT COUNT(*) FROM pragma_table_info('kanban_boards') WHERE name='icon'`).Scan(&count)
+	if count == 0 {
+		s.db.Exec(`ALTER TABLE kanban_boards ADD COLUMN icon TEXT`)
 	}
 }
 
@@ -1418,20 +1432,21 @@ func (s *Store) DeleteWebhook(id, userID string) error {
 
 // Kanban Board operations
 
-func (s *Store) CreateBoard(name, description, createdBy string) (*models.Board, error) {
+func (s *Store) CreateBoard(name, description, icon, createdBy string) (*models.Board, error) {
 	board := &models.Board{
 		ID:          uuid.New().String(),
 		Name:        name,
 		Description: description,
+		Icon:        icon,
 		CreatedBy:   createdBy,
 		CreatedAt:   time.Now(),
 		UpdatedAt:   time.Now(),
 	}
 
 	_, err := s.db.Exec(`
-		INSERT INTO kanban_boards (id, name, description, created_by, created_at, updated_at)
-		VALUES (?, ?, ?, ?, ?, ?)
-	`, board.ID, board.Name, board.Description, board.CreatedBy, board.CreatedAt, board.UpdatedAt)
+		INSERT INTO kanban_boards (id, name, description, icon, created_by, created_at, updated_at)
+		VALUES (?, ?, ?, ?, ?, ?, ?)
+	`, board.ID, board.Name, board.Description, board.Icon, board.CreatedBy, board.CreatedAt, board.UpdatedAt)
 
 	if err != nil {
 		return nil, err
@@ -1446,9 +1461,9 @@ func (s *Store) CreateBoard(name, description, createdBy string) (*models.Board,
 func (s *Store) GetBoard(id string) (*models.Board, error) {
 	board := &models.Board{}
 	err := s.db.QueryRow(`
-		SELECT id, name, COALESCE(description, ''), created_by, created_at, updated_at
+		SELECT id, name, COALESCE(description, ''), COALESCE(icon, ''), created_by, created_at, updated_at
 		FROM kanban_boards WHERE id = ?
-	`, id).Scan(&board.ID, &board.Name, &board.Description, &board.CreatedBy, &board.CreatedAt, &board.UpdatedAt)
+	`, id).Scan(&board.ID, &board.Name, &board.Description, &board.Icon, &board.CreatedBy, &board.CreatedAt, &board.UpdatedAt)
 
 	if err != nil {
 		return nil, err
@@ -1458,7 +1473,7 @@ func (s *Store) GetBoard(id string) (*models.Board, error) {
 
 func (s *Store) GetBoardsForUser(userID string) ([]models.BoardWithDetails, error) {
 	rows, err := s.db.Query(`
-		SELECT b.id, b.name, COALESCE(b.description, ''), b.created_by, b.created_at, b.updated_at,
+		SELECT b.id, b.name, COALESCE(b.description, ''), COALESCE(b.icon, ''), b.created_by, b.created_at, b.updated_at,
 			(SELECT COUNT(*) FROM kanban_columns WHERE board_id = b.id) as column_count,
 			(SELECT COUNT(*) FROM kanban_cards WHERE board_id = b.id) as card_count,
 			(SELECT COUNT(*) FROM kanban_board_members WHERE board_id = b.id) as member_count
@@ -1475,7 +1490,7 @@ func (s *Store) GetBoardsForUser(userID string) ([]models.BoardWithDetails, erro
 	var boards []models.BoardWithDetails
 	for rows.Next() {
 		var b models.BoardWithDetails
-		err := rows.Scan(&b.ID, &b.Name, &b.Description, &b.CreatedBy, &b.CreatedAt, &b.UpdatedAt,
+		err := rows.Scan(&b.ID, &b.Name, &b.Description, &b.Icon, &b.CreatedBy, &b.CreatedAt, &b.UpdatedAt,
 			&b.ColumnCount, &b.CardCount, &b.MemberCount)
 		if err != nil {
 			return nil, err
@@ -1485,7 +1500,14 @@ func (s *Store) GetBoardsForUser(userID string) ([]models.BoardWithDetails, erro
 	return boards, nil
 }
 
-func (s *Store) UpdateBoard(id, name, description string) error {
+func (s *Store) UpdateBoard(id, name, description string, icon *string) error {
+	if icon != nil {
+		_, err := s.db.Exec(`
+			UPDATE kanban_boards SET name = ?, description = ?, icon = ?, updated_at = ?
+			WHERE id = ?
+		`, name, description, *icon, time.Now(), id)
+		return err
+	}
 	_, err := s.db.Exec(`
 		UPDATE kanban_boards SET name = ?, description = ?, updated_at = ?
 		WHERE id = ?
@@ -2538,5 +2560,21 @@ func (s *Store) SetUserPreference(userID, key, value string) error {
 
 func (s *Store) DeleteUserPreference(userID, key string) error {
 	_, err := s.db.Exec("DELETE FROM user_preferences WHERE user_id = ? AND key = ?", userID, key)
+	return err
+}
+
+// Server settings
+
+func (s *Store) GetServerSetting(key string) (string, error) {
+	var value string
+	err := s.db.QueryRow("SELECT value FROM server_settings WHERE key = ?", key).Scan(&value)
+	return value, err
+}
+
+func (s *Store) SetServerSetting(key, value string) error {
+	_, err := s.db.Exec(`
+		INSERT INTO server_settings (key, value, updated_at) VALUES (?, ?, CURRENT_TIMESTAMP)
+		ON CONFLICT(key) DO UPDATE SET value = excluded.value, updated_at = CURRENT_TIMESTAMP
+	`, key, value)
 	return err
 }

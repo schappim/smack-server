@@ -50,7 +50,7 @@ func (h *KanbanHandler) CreateBoard(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	board, err := h.store.CreateBoard(req.Name, req.Description, userID)
+	board, err := h.store.CreateBoard(req.Name, req.Description, req.Icon, userID)
 	if err != nil {
 		http.Error(w, "Failed to create board", http.StatusInternalServerError)
 		return
@@ -146,7 +146,7 @@ func (h *KanbanHandler) UpdateBoard(w http.ResponseWriter, r *http.Request) {
 		description = req.Description
 	}
 
-	err = h.store.UpdateBoard(boardID, name, description)
+	err = h.store.UpdateBoard(boardID, name, description, req.Icon)
 	if err != nil {
 		http.Error(w, "Failed to update board", http.StatusInternalServerError)
 		return
