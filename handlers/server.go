@@ -4,7 +4,6 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -185,5 +184,5 @@ func (h *ServerHandler) GetPublicInfo(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	fmt.Fprintf(w, `{"name":%q,"icon_url":%q}`, info.Name, info.IconURL)
+	json.NewEncoder(w).Encode(info)
 }
