@@ -65,22 +65,32 @@ func (h *Hub) Run() {
 		case client := <-h.register:
 			log.Printf("[WS HUB] >>> Received register request for client %s", client.userID)
 			h.mu.Lock()
+			// Check if this user already has a connection (for online status broadcast)
+			isFirstConnection := true
+			for c := range h.clients {
+				if c.userID == client.userID {
+					isFirstConnection = false
+					break
+				}
+			}
 			h.clients[client] = true
 			clientCount := len(h.clients)
 			h.mu.Unlock()
 
-			log.Printf("[WS HUB] ✅ Client registered: %s (total clients: %d)", client.userID, clientCount)
+			log.Printf("[WS HUB] ✅ Client registered: %s (total clients: %d, first=%v)", client.userID, clientCount, isFirstConnection)
 
 			// Update user status to online
 			h.store.UpdateUserStatus(client.userID, "online")
 
-			// Broadcast user online status (in goroutine to avoid deadlock)
-			go h.BroadcastAll(models.WSMessage{
-				Type: models.WSTypeUserOnline,
-				Payload: map[string]string{
-					"user_id": client.userID,
-				},
-			})
+			// Only broadcast user_online on first connection to avoid duplicate notifications
+			if isFirstConnection {
+				go h.BroadcastAll(models.WSMessage{
+					Type: models.WSTypeUserOnline,
+					Payload: map[string]string{
+						"user_id": client.userID,
+					},
+				})
+			}
 
 		case client := <-h.unregister:
 			h.mu.Lock()
@@ -90,22 +100,33 @@ func (h *Hub) Run() {
 				delete(h.clients, client)
 				close(client.send)
 			}
+			// Check if user has any remaining connections
+			hasOtherConnections := false
+			if wasPresent {
+				for c := range h.clients {
+					if c.userID == client.userID {
+						hasOtherConnections = true
+						break
+					}
+				}
+			}
 			clientCount := len(h.clients)
 			h.mu.Unlock()
 
 			if wasPresent {
-				log.Printf("[WS HUB] ❌ Client unregistered: %s (total clients: %d)", client.userID, clientCount)
+				log.Printf("[WS HUB] ❌ Client unregistered: %s (total clients: %d, other connections: %v)", client.userID, clientCount, hasOtherConnections)
 
-				// Update user status to offline
-				h.store.UpdateUserStatus(client.userID, "offline")
+				// Only mark offline and broadcast if this was the user's last connection
+				if !hasOtherConnections {
+					h.store.UpdateUserStatus(client.userID, "offline")
 
-				// Broadcast user offline status (in goroutine to avoid deadlock)
-				go h.BroadcastAll(models.WSMessage{
-					Type: models.WSTypeUserOffline,
-					Payload: map[string]string{
-						"user_id": client.userID,
-					},
-				})
+					go h.BroadcastAll(models.WSMessage{
+						Type: models.WSTypeUserOffline,
+						Payload: map[string]string{
+							"user_id": client.userID,
+						},
+					})
+				}
 			} else {
 				log.Printf("[WS HUB] Client unregister requested but not found: %s", client.userID)
 			}
@@ -320,8 +341,8 @@ func (h *Hub) HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("[WS] Token validated for user %s from %s", claims.UserID, r.RemoteAddr)
 
-	// Disconnect any existing connections for this user BEFORE upgrading
-	h.disconnectUser(claims.UserID)
+	// Allow multiple connections per user (e.g. desktop + laptop)
+	// Do NOT disconnect existing connections
 
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
